@@ -15,6 +15,7 @@ function register_rsvp_widget()
 {
     if (did_action('elementor/loaded')) {
         require_once(__DIR__ . '/rsvp-elementor-widget.php');
+        require_once(__DIR__ . '/rsvp-counts-elementor-widget.php');
     }
 }
 add_action('elementor/widgets/widgets_registered', 'register_rsvp_widget');
@@ -82,41 +83,7 @@ function display_rsvp_form($atts)
         <div class="rsvp-wrap">
             <div class="rsvp-header"></div>
 
-            <div class="rsvp-counts">
-                <div class="rsvp-counts-total">
-                    <p><?php echo $total_comments; ?> Ucapan</p>
-                </div>
-                <div class="rsvp-counts-detail">
-                    <div class="rsvp-counts-detail-wrap">
-                        <div class="rsvp-counts-detail-item">
-                            <div class="rsvp-counts-detail-item-title">
-                                <p>Hadir</p>
-                            </div>
-                            <div class="rsvp-counts-details-item-number">
-                                <?php echo $count_hadir; ?>
-                            </div>
-                        </div>
-                        <div class="rsvp-counts-detail-item">
-                            <div class="rsvp-counts-detail-item-title">
-                                <p>Tidak Hadir</p>
-                            </div>
-                            <div class="rsvp-counts-details-item-number">
-                                <?php echo $count_tidak_hadir; ?>
-                            </div>
-                        </div>
-
-                        <div class="rsvp-counts-detail-item">
-                            <div class="rsvp-counts-detail-item-title">
-                                <p>Ragu</p>
-                            </div>
-                            <div class="rsvp-counts-details-item-number">
-                                <?php echo $count_masih_ragu; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+      
             <div class="rsvp-form">
                 <form method="post" action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>">
                     <input type="hidden" name="rsvp_form_submitted" value="1">
@@ -149,7 +116,7 @@ add_shortcode('rsvp_form', 'display_rsvp_form');
 
 
 
-function display_rsvp_comments($rsvp_title = 'RSVP Comments')
+function display_rsvp_comments($rsvp_title = 'Comments')
 {
 ?>
     <h2><?php echo esc_html($rsvp_title); ?></h2>

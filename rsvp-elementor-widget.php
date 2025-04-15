@@ -28,10 +28,11 @@ class Elementor_RSVP_Widget extends \Elementor\Widget_Base
 
     protected function _register_controls()
     {
+        // Content Section
         $this->start_controls_section(
-            'section_title',
+            'section_content',
             [
-                'label' => __('Title', 'wedding-rsvp-wishes'),
+                'label' => __('Content', 'wedding-rsvp-wishes'),
                 'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
             ]
         );
@@ -46,16 +47,75 @@ class Elementor_RSVP_Widget extends \Elementor\Widget_Base
         );
 
         $this->end_controls_section();
+
+        // Style Section
+        $this->start_controls_section(
+            'section_style',
+            [
+                'label' => __('Style', 'wedding-rsvp-wishes'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'form_typography',
+                'label' => __('Typography', 'wedding-rsvp-wishes'),
+                'selector' => '{{WRAPPER}} .rsvp-form',
+            ]
+        );
+
+        $this->add_control(
+            'form_text_color',
+            [
+                'label' => __('Text Color', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .rsvp-form' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'form_alignment',
+            [
+                'label' => __('Alignment', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::CHOOSE,
+                'options' => [
+                    'left' => [
+                        'title' => __('Left', 'wedding-rsvp-wishes'),
+                        'icon' => 'eicon-text-align-left',
+                    ],
+                    'center' => [
+                        'title' => __('Center', 'wedding-rsvp-wishes'),
+                        'icon' => 'eicon-text-align-center',
+                    ],
+                    'right' => [
+                        'title' => __('Right', 'wedding-rsvp-wishes'),
+                        'icon' => 'eicon-text-align-right',
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .rsvp-form' => 'text-align: {{VALUE}};',
+                ],
+                'default' => 'left',
+            ]
+        );
+
+        $this->end_controls_section();
     }
-
-
 
     protected function render()
     {
         $settings = $this->get_settings_for_display();
         $rsvp_comments_title = !empty($settings['rsvp_comments_title']) ? $settings['rsvp_comments_title'] : 'RSVP Comments';
 
-        echo do_shortcode('[rsvp_form rsvp_title="' . esc_attr($rsvp_comments_title) . '"]');
+        // Render the RSVP form without the counter
+        echo '<div class="rsvp-form">';
+        echo '<h2>' . esc_html($rsvp_comments_title) . '</h2>';
+        echo do_shortcode('[rsvp_form]');
+        echo '</div>';
     }
 }
 
