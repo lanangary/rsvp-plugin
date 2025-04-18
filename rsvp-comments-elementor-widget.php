@@ -289,6 +289,73 @@ class Elementor_RSVP_Comments_Widget extends \Elementor\Widget_Base
         );
 
         $this->end_controls_section();
+
+        // Style Section for Item Border
+        $this->start_controls_section(
+            'section_style_item_border',
+            [
+                'label' => __('Item Border', 'wedding-rsvp-wishes'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Border::get_type(),
+            [
+                'name' => 'item_border',
+                'label' => __('Border', 'wedding-rsvp-wishes'),
+                'selector' => '{{WRAPPER}} .rsvp-comments-list-item',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'item_border_radius',
+            [
+                'label' => __('Border Radius', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .rsvp-comments-list-item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // Style Section for Item Margin and Padding
+        $this->start_controls_section(
+            'section_style_item_spacing',
+            [
+                'label' => __('Item Spacing', 'wedding-rsvp-wishes'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_responsive_control(
+            'item_margin',
+            [
+                'label' => __('Margin', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .rsvp-comments-list-item' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'item_padding',
+            [
+                'label' => __('Padding', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .rsvp-comments-list-item' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
     }
 
     protected function render()
