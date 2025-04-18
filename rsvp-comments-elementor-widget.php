@@ -48,11 +48,11 @@ class Elementor_RSVP_Comments_Widget extends \Elementor\Widget_Base
 
         $this->end_controls_section();
 
-        // Style Section
+        // Style Section for Item Title
         $this->start_controls_section(
-            'section_style',
+            'section_style_item_title',
             [
-                'label' => __('Style', 'wedding-rsvp-wishes'),
+                'label' => __('Item Title', 'wedding-rsvp-wishes'),
                 'tab' => \Elementor\Controls_Manager::TAB_STYLE,
             ]
         );
@@ -60,46 +60,161 @@ class Elementor_RSVP_Comments_Widget extends \Elementor\Widget_Base
         $this->add_group_control(
             \Elementor\Group_Control_Typography::get_type(),
             [
-                'name' => 'comments_typography',
+                'name' => 'item_title_typography',
                 'label' => __('Typography', 'wedding-rsvp-wishes'),
-                'selector' => '{{WRAPPER}} #rsvp-comments',
+                'selector' => '{{WRAPPER}} .item-title',
             ]
         );
 
         $this->add_control(
-            'comments_text_color',
+            'item_title_color',
             [
                 'label' => __('Text Color', 'wedding-rsvp-wishes'),
                 'type' => \Elementor\Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} #rsvp-comments' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .item-title' => 'color: {{VALUE}};',
                 ],
             ]
         );
 
         $this->add_responsive_control(
-            'comments_alignment',
+            'item_title_margin',
             [
-                'label' => __('Alignment', 'wedding-rsvp-wishes'),
-                'type' => \Elementor\Controls_Manager::CHOOSE,
-                'options' => [
-                    'left' => [
-                        'title' => __('Left', 'wedding-rsvp-wishes'),
-                        'icon' => 'eicon-text-align-left',
-                    ],
-                    'center' => [
-                        'title' => __('Center', 'wedding-rsvp-wishes'),
-                        'icon' => 'eicon-text-align-center',
-                    ],
-                    'right' => [
-                        'title' => __('Right', 'wedding-rsvp-wishes'),
-                        'icon' => 'eicon-text-align-right',
-                    ],
-                ],
+                'label' => __('Margin', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
                 'selectors' => [
-                    '{{WRAPPER}} #rsvp-comments' => 'text-align: {{VALUE}};',
+                    '{{WRAPPER}} .item-title' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ],
-                'default' => 'left',
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // Style Section for Item Message
+        $this->start_controls_section(
+            'section_style_item_message',
+            [
+                'label' => __('Item Message', 'wedding-rsvp-wishes'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'item_message_typography',
+                'label' => __('Typography', 'wedding-rsvp-wishes'),
+                'selector' => '{{WRAPPER}} .item-message',
+            ]
+        );
+
+        $this->add_control(
+            'item_message_color',
+            [
+                'label' => __('Text Color', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .item-message' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'item_message_margin',
+            [
+                'label' => __('Margin', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .item-message' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // Style Section for Item Date
+        $this->start_controls_section(
+            'section_style_item_date',
+            [
+                'label' => __('Item Date', 'wedding-rsvp-wishes'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'item_date_typography',
+                'label' => __('Typography', 'wedding-rsvp-wishes'),
+                'selector' => '{{WRAPPER}} .item-date',
+            ]
+        );
+
+        $this->add_control(
+            'item_date_color',
+            [
+                'label' => __('Text Color', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .item-date' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'item_date_margin',
+            [
+                'label' => __('Margin', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .item-date' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
+        // Style Section for Pagination
+        $this->start_controls_section(
+            'section_style_pagination',
+            [
+                'label' => __('Pagination', 'wedding-rsvp-wishes'),
+                'tab' => \Elementor\Controls_Manager::TAB_STYLE,
+            ]
+        );
+
+        $this->add_group_control(
+            \Elementor\Group_Control_Typography::get_type(),
+            [
+                'name' => 'pagination_typography',
+                'label' => __('Typography', 'wedding-rsvp-wishes'),
+                'selector' => '{{WRAPPER}} .pagination-style',
+            ]
+        );
+
+        $this->add_control(
+            'pagination_color',
+            [
+                'label' => __('Text Color', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .pagination-style' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'pagination_margin',
+            [
+                'label' => __('Margin', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::DIMENSIONS,
+                'size_units' => ['px', '%', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .pagination-style' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
             ]
         );
 

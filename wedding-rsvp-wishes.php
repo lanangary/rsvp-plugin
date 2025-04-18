@@ -51,26 +51,17 @@ register_activation_hook(__FILE__, 'create_rsvp_table');
 function display_rsvp_form($atts)
 {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'wedding_rsvp';
     $page_id = get_the_ID();
 
-    // Get RSVP counts
-    $count_hadir = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE attendance = 'Hadir' AND page_id = %d",
-        $page_id
-    ));
-    $count_tidak_hadir = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE attendance = 'Tidak Hadir' AND page_id = %d",
-        $page_id
-    ));
-    $count_masih_ragu = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE attendance = 'Masih Ragu' AND page_id = %d",
-        $page_id
-    ));
-    $total_comments = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE page_id = %d",
-        $page_id
-    ));
+    // Extract the success message from the shortcode attributes
+    $atts = shortcode_atts(
+        [
+            'success_message' => 'Thank you for your RSVP!',
+        ],
+        $atts
+    );
+
+    $success_message = $atts['success_message'];
 
     ob_start();
 ?>
@@ -78,10 +69,9 @@ function display_rsvp_form($atts)
         <div class="rsvp-wrap">
             <div class="rsvp-header"></div>
 
-      
             <div class="rsvp-form">
-                <form method="post" action="<?php echo esc_url($_SERVER['REQUEST_URI']); ?>">
-                    <input type="hidden" name="rsvp_form_submitted" value="1">
+                <form id="rsvp-form" method="post">
+                    <input type="hidden" name="action" value="submit_rsvp_form">
                     <input type="hidden" name="page_id" value="<?php echo $page_id; ?>">
 
                     <input type="text" id="name" name="name" placeholder="Nama" required>
@@ -95,14 +85,40 @@ function display_rsvp_form($atts)
 
                     <textarea id="message" name="message" placeholder="Ucapan"></textarea>
 
-                    <input class="rsvp-submit" type="submit" name="submit_rsvp" value="Submit">
+                    <input class="rsvp-submit" type="submit" value="Submit">
                 </form>
+                <div id="rsvp-success-message" style="display: none;"><?php echo esc_html($success_message); ?></div>
             </div>
         </div>
     </div>
 
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            $('#rsvp-form').on('submit', function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: "<?php echo admin_url('admin-ajax.php'); ?>",
+                    type: "POST",
+                    data: formData,
+                    success: function (response) {
+                        if (response.success) {
+                            $('#rsvp-form').hide();
+                            $('#rsvp-success-message').html(response.data).show();
+                        } else {
+                            alert('Error: ' + response.data);
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
 <?php
-  
     return ob_get_clean();
 }
 add_shortcode('rsvp_form', 'display_rsvp_form');
@@ -110,42 +126,58 @@ add_shortcode('rsvp_form', 'display_rsvp_form');
 
 
 
-
-
 // Handle form submissions
-function handle_rsvp_form()
+function submit_rsvp_form_ajax()
 {
-    if (isset($_POST['rsvp_form_submitted'])) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'wedding_rsvp';
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'wedding_rsvp';
 
-        $name = sanitize_text_field($_POST['name']);
-        $attendance = sanitize_text_field($_POST['attendance']);
-        $message = sanitize_textarea_field($_POST['message']);
-        $page_id = intval($_POST['page_id']);
+    $name = sanitize_text_field($_POST['name']);
+    $attendance = sanitize_text_field($_POST['attendance']);
+    $message = sanitize_textarea_field($_POST['message']);
+    $page_id = intval($_POST['page_id']);
 
-        $inserted = $wpdb->insert(
-            $table_name,
-            array(
-                'page_id' => $page_id,
-                'name' => $name,
-                'attendance' => $attendance,
-                'message' => $message,
-                'submitted_at' => current_time('mysql')
-            )
-        );
+    if (empty($name) || empty($attendance)) {
+        wp_send_json_error('Name and attendance are required.');
+    }
 
-        // Debugging: Log errors
-        if ($inserted === false) {
-            error_log('Failed to insert RSVP data: ' . $wpdb->last_error);
-            echo '<p>There was an error submitting your RSVP. Please try again. Check the error log for details.</p>';
-        } else {
-            echo '<script type="text/javascript">window.location.href="' . esc_url($_SERVER['REQUEST_URI']) . '";</script>';
-            exit;
+    $inserted = $wpdb->insert(
+        $table_name,
+        array(
+            'page_id' => $page_id,
+            'name' => $name,
+            'attendance' => $attendance,
+            'message' => $message,
+            'submitted_at' => current_time('mysql')
+        )
+    );
+
+    if ($inserted === false) {
+        wp_send_json_error('Failed to submit RSVP. Please try again.');
+    } else {
+        // Dynamically fetch the success message from the widget settings
+        $widget_id = $_POST['widget_id'] ?? null; // Pass the widget ID from the form
+        $success_message = 'Thank you!'; // Default message
+
+        if ($widget_id) {
+            $elementor_data = get_post_meta($page_id, '_elementor_data', true);
+            if ($elementor_data) {
+                $elementor_data = json_decode($elementor_data, true);
+                foreach ($elementor_data as $widget) {
+                    if ($widget['id'] === $widget_id && isset($widget['settings']['rsvp_success_message'])) {
+                        $success_message = $widget['settings']['rsvp_success_message'];
+                        break;
+                    }
+                }
+            }
         }
+
+        wp_send_json_success($success_message);
     }
 }
-add_action('init', 'handle_rsvp_form');
+
+add_action('wp_ajax_submit_rsvp_form', 'submit_rsvp_form_ajax');
+add_action('wp_ajax_nopriv_submit_rsvp_form', 'submit_rsvp_form_ajax');
 
 
 function load_rsvp_comments_ajax()
@@ -173,7 +205,7 @@ function load_rsvp_comments_ajax()
     $total_pages = ceil($total_comments / $limit);
 
     // Include the template file
-    include __DIR__ . '/rsvp-comments-template.php';
+    include __DIR__ . '/template/rsvp-comments-template.php';
 
     wp_die();
 }
