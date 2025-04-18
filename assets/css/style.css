@@ -1,0 +1,13 @@
+.rsvp-comments-list-item {
+    display: flex;
+    gap: 20px;
+}
+.rsvp-comments-list-item-section:first-child {
+    width: 40px;
+    height: auto;
+}
+
+.rsvp-comments-list-item-icon {
+    border-radius: 50%;
+    overflow: hidden;
+}

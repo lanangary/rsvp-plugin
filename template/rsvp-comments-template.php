@@ -2,8 +2,23 @@
 
 <?php if ($rsvps): ?>
     <div class="rsvp-comments-list">
-        <?php foreach ($rsvps as $rsvp): ?>
+        <?php foreach ($rsvps as $rsvp):
+                // var_dump($settings['icon_type']); // Debugging line to check the $rsvp object
+            ?>
+        
             <div class="rsvp-comments-list-item">
+                <div class="rsvp-comments-list-item-section">
+                <?php if ($settings['enable_icon'] == 'yes'): ?>
+                    <div class="rsvp-comments-list-item-icon">
+                        <?php if ($settings['icon_type'] == 'icon' && !empty($settings['icon']['value'])): ?>
+                            <i class="<?php echo esc_attr($settings['icon']['value']); ?>"></i>
+                        <?php elseif ($settings['icon_type'] == 'image'): ?>
+                            <img src="<?php echo esc_url($settings['icon']['value']); ?>" alt="Comment Icon">
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                </div>
+                <div class="rsvp-comments-list-item-section">
                 <div class="rsvp-comments-list-item-title item-title">
                     <?php echo esc_html($rsvp->name); ?> (<?php echo esc_html($rsvp->attendance); ?>)
                 </div>
@@ -13,6 +28,7 @@
                 <div class="rsvp-comments-list-item-date item-date">
                     <?php echo date('F j, Y, g:i a', strtotime($rsvp->submitted_at)); ?>
                 </div>
+            </div>
             </div>
         <?php endforeach; ?>
     </div>

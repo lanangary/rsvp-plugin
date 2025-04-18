@@ -48,6 +48,76 @@ class Elementor_RSVP_Comments_Widget extends \Elementor\Widget_Base
 
         $this->end_controls_section();
 
+        // Icon Settings Section
+        $this->start_controls_section(
+            'section_icon_settings',
+            [
+                'label' => __('Icon Settings', 'wedding-rsvp-wishes'),
+                'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+            ]
+        );
+
+        $this->add_control(
+            'enable_icon',
+            [
+                'label' => __('Enable Icon', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Yes', 'wedding-rsvp-wishes'),
+                'label_off' => __('No', 'wedding-rsvp-wishes'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+            ]
+        );
+
+        $this->add_control(
+            'icon_type',
+            [
+                'label' => __('Icon Type', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'default' => 'icon',
+                'options' => [
+                    'icon' => __('Font Icon', 'wedding-rsvp-wishes'),
+                    'image' => __('Image', 'wedding-rsvp-wishes'),
+                ],
+                'condition' => [
+                    'enable_icon' => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'icon',
+            [
+                'label' => __('Icon', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::ICONS,
+                'default' => [
+                    'value' => 'fas fa-star',
+                    'library' => 'solid',
+                ],
+                'condition' => [
+                    'enable_icon' => 'yes',
+                    'icon_type' => 'icon',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'icon_image',
+            [
+                'label' => __('Icon Image', 'wedding-rsvp-wishes'),
+                'type' => \Elementor\Controls_Manager::MEDIA,
+                'default' => [
+                    'url' => \Elementor\Utils::get_placeholder_image_src(),
+                ],
+                'condition' => [
+                    'enable_icon' => 'yes',
+                    'icon_type' => 'image',
+                ],
+            ]
+        );
+
+        $this->end_controls_section();
+
         // Style Section for Item Title
         $this->start_controls_section(
             'section_style_item_title',
@@ -224,6 +294,9 @@ class Elementor_RSVP_Comments_Widget extends \Elementor\Widget_Base
     protected function render()
     {
         $settings = $this->get_settings_for_display();
+        $icon_value = $settings['icon'] != NULL ? $settings['icon']['value'] : $settings['icon_image']['url'];
+        // var_dump($settings['icon_type']); // Debugging line to check the $settings object
+        // var_dump($icon_value); // Debugging line to check the $settings object
         // Render the comments section
         echo '<div class="rsvp-comments-widget">';
         echo '<div id="rsvp-comments">';
@@ -238,7 +311,10 @@ class Elementor_RSVP_Comments_Widget extends \Elementor\Widget_Base
                         data: {
                             action: "load_rsvp_comments",
                             page: page,
-                            post_id: ' . get_the_ID() . '
+                            post_id: ' . get_the_ID() . ',
+                            icon_value: "' . esc_js($icon_value) . '",
+                            icon_type: "' . esc_js($settings['icon_type']) . '",
+                           
                         },
                         success: function(response) {
                             $("#rsvp-comments").html(response);

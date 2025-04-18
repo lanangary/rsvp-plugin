@@ -45,7 +45,17 @@ function create_rsvp_table()
 }
 register_activation_hook(__FILE__, 'create_rsvp_table');
 
-
+// Enqueue plugin styles
+function rsvp_plugin_enqueue_styles() {
+    wp_enqueue_style(
+        'rsvp-plugin-styles', // Handle for the stylesheet
+        plugin_dir_url(__FILE__) . 'assets/css/style.css', // Path to the CSS file
+        [], // Dependencies (if any)
+        '1.0', // Version number
+        'all' // Media type
+    );
+}
+add_action('wp_enqueue_scripts', 'rsvp_plugin_enqueue_styles');
 
 // Shortcode to display the RSVP form and comments
 function display_rsvp_form($atts)
@@ -123,9 +133,6 @@ function display_rsvp_form($atts)
 }
 add_shortcode('rsvp_form', 'display_rsvp_form');
 
-
-
-
 // Handle form submissions
 function submit_rsvp_form_ajax()
 {
@@ -179,13 +186,14 @@ function submit_rsvp_form_ajax()
 add_action('wp_ajax_submit_rsvp_form', 'submit_rsvp_form_ajax');
 add_action('wp_ajax_nopriv_submit_rsvp_form', 'submit_rsvp_form_ajax');
 
-
 function load_rsvp_comments_ajax()
 {
     global $wpdb;
     $table_name = $wpdb->prefix . 'wedding_rsvp';
 
     $page_id = intval($_POST['post_id']);
+    $icon_value = isset($_POST['icon_value']) ? sanitize_text_field($_POST['icon_value']) : 'fas fa-star'; // Default icon value
+    $the_type = isset($_POST['icon_type']) ? sanitize_text_field($_POST['icon_type']) : 'icon'; // Default icon type
     $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
     $limit = 6;
     $offset = ($page - 1) * $limit;
@@ -203,8 +211,15 @@ function load_rsvp_comments_ajax()
     ));
 
     $total_pages = ceil($total_comments / $limit);
-
-    // Include the template file
+    
+    // Get widget settings
+    $settings = isset($_POST['settings']) ? json_decode(stripslashes($_POST['settings']), true) : [];
+   
+    $settings['enable_icon'] = isset($settings['enable_icon']) ? $settings['enable_icon'] : 'yes';
+    $settings['icon_type'] = $the_type; 
+    $settings['icon'] = isset($settings['icon']) ? $settings['icon'] : ['value' => $icon_value]; // Default icon
+    // var_dump($the_type); // Debugging line to check the $settings array
+    // Include the template file and pass the settings
     include __DIR__ . '/template/rsvp-comments-template.php';
 
     wp_die();
@@ -212,6 +227,5 @@ function load_rsvp_comments_ajax()
 
 add_action('wp_ajax_load_rsvp_comments', 'load_rsvp_comments_ajax');
 add_action('wp_ajax_nopriv_load_rsvp_comments', 'load_rsvp_comments_ajax');
-
 
 ?>
