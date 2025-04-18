@@ -16,6 +16,7 @@ function register_rsvp_widget()
     if (did_action('elementor/loaded')) {
         require_once(__DIR__ . '/rsvp-elementor-widget.php');
         require_once(__DIR__ . '/rsvp-counts-elementor-widget.php');
+        require_once(__DIR__ . '/rsvp-comments-elementor-widget.php');
     }
 }
 add_action('elementor/widgets/widgets_registered', 'register_rsvp_widget');
@@ -53,12 +54,6 @@ function display_rsvp_form($atts)
     $table_name = $wpdb->prefix . 'wedding_rsvp';
     $page_id = get_the_ID();
 
-    $atts = shortcode_atts([
-        'rsvp_title' => 'RSVP Comments'
-    ], $atts);
-
-    $rsvp_title = esc_html($atts['rsvp_title']);
-
     // Get RSVP counts
     $count_hadir = $wpdb->get_var($wpdb->prepare(
         "SELECT COUNT(*) FROM $table_name WHERE attendance = 'Hadir' AND page_id = %d",
@@ -79,7 +74,7 @@ function display_rsvp_form($atts)
 
     ob_start();
 ?>
-    <div class="module rsvp">
+    <div class="module-rsvp">
         <div class="rsvp-wrap">
             <div class="rsvp-header"></div>
 
@@ -107,53 +102,10 @@ function display_rsvp_form($atts)
     </div>
 
 <?php
-    display_rsvp_comments($rsvp_title);
+  
     return ob_get_clean();
 }
 add_shortcode('rsvp_form', 'display_rsvp_form');
-
-
-
-
-
-function display_rsvp_comments($rsvp_title = 'Comments')
-{
-?>
-    <h2><?php echo esc_html($rsvp_title); ?></h2>
-    <div id="rsvp-comments">
-        <p>Loading comments...</p>
-    </div>
-    <script type="text/javascript">
-        jQuery(document).ready(function($) {
-            function loadRSVPComments(page) {
-                $.ajax({
-                    url: "<?php echo admin_url('admin-ajax.php'); ?>",
-                    type: "POST",
-                    data: {
-                        action: "load_rsvp_comments",
-                        page: page,
-                        post_id: <?php echo get_the_ID(); ?>
-                    },
-                    success: function(response) {
-                        $("#rsvp-comments").html(response);
-                    }
-                });
-            }
-
-            // Load first page
-            loadRSVPComments(1);
-
-            // Handle pagination click
-            $(document).on("click", ".rsvp-pagination a", function(e) {
-                e.preventDefault();
-                var page = $(this).data("page");
-                loadRSVPComments(page);
-            });
-        });
-    </script>
-<?php
-}
-
 
 
 
@@ -218,29 +170,10 @@ function load_rsvp_comments_ajax()
         $page_id
     ));
 
-    if ($rsvps) {
-        echo '<ul>';
-        foreach ($rsvps as $rsvp) {
-            echo '<li>';
-            echo '<strong>' . esc_html($rsvp->name) . ' (' . esc_html($rsvp->attendance) . ')</strong><br>';
-            echo esc_html($rsvp->message) . '<br>';
-            echo '<em>' . date('F j, Y, g:i a', strtotime($rsvp->submitted_at)) . '</em>';
-            echo '</li>';
-        }
-        echo '</ul>';
+    $total_pages = ceil($total_comments / $limit);
 
-        // Pagination links
-        $total_pages = ceil($total_comments / $limit);
-        if ($total_pages > 1) {
-            echo '<div class="rsvp-pagination">';
-            for ($i = 1; $i <= $total_pages; $i++) {
-                echo '<a href="#" data-page="' . $i . '" class="rsvp-page-link">' . $i . '</a> ';
-            }
-            echo '</div>';
-        }
-    } else {
-        echo '<p>No RSVPs yet. Be the first to RSVP!</p>';
-    }
+    // Include the template file
+    include __DIR__ . '/rsvp-comments-template.php';
 
     wp_die();
 }
